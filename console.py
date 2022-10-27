@@ -23,9 +23,30 @@ class HBNBCommand(cmd.Cmd):
         """This overides the emptyline command"""
         pass;
     
-    def create(self, line):
+    def do_create(self, obj=None):
         """This creates a new instance of BaseModel"""
+        if obj is None:
+            print("** class name missing **")
+            return;
+        if obj != "BaseModel":
+            print("** class name doesn't exist **")
+            return
+        obj = BaseModel()
+        obj.save()
+        print(obj.id)
 
+    def do_show(self, className=None, id=None):
+        """This displays information about a """
+        if className is None:
+            print("** class name missing **")
+            return
+        if className != "BaseModel":
+            print("** class name doesn't exist ** ")
+            return
+        if id is None:
+            print("** instance id missing **")
+        ###not done
+    
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
