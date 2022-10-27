@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #This is a module that holds the class file storage
 import json
-
+from  models.base_model import BaseModel
 
 class FileStorage:
     """This class serializes instances to json strings"""
@@ -27,9 +27,10 @@ class FileStorage:
         """This deserializes the JSON file"""
         try:
             with open(FileStorage.__file_path, 'r') as f:
-                json.load(f)
+                ob = json.load(f)
+                for o in ob.values():
+                    cls = o["__class__"]
+                    self.new(eval(cls)(**o))
+
         except IOError:
-            pass
-
-
-    
+            return
