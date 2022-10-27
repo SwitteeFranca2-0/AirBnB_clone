@@ -38,19 +38,53 @@ class HBNBCommand(cmd.Cmd):
         inp = line.split(" ")
         inp = [o.strip('"') for o in inp]
         return inp
-    
+
     def do_quit(self, line):
         """Quit command to exit the program\n"""
         exit();
-    
+
     def do_EOF(self, line):
         """eof command to exit the program\n"""
         exit();
-    
+
     def emptyline(self):
         """This overides the emptyline command"""
         pass;
     
+    def default(self, line):
+        """This overrides the default command"""
+        cmds = {"all()": self.do_all, 
+                "count()": self.count
+            }
+        cmds2 ={"show": self.do_show, 
+                "destroy": self.do_destroy,
+                "update": self.do_update
+            }
+        args = line.split(".")
+        if "." not in line:
+            print("** Unknown syntax: {} **".format(line))
+            return
+        if args[1] not in cmds.keys() and args[1].split("(")[0] not in cmds2.keys():
+            print("** Unknown syntax: {} **".format(line))
+            return
+        if args[1] in cmds:
+            cmds[args[1]]("{}".format(args[0]))
+        else:
+            if "update" not in args[1]:
+                id = args[1].split('("')[1].split('")')[0]
+                cmds2[args[1].split("(")[0]]("{} {}".format(args[0], id))
+            else:
+                pass
+                #To be continued
+
+
+    def count(self, line):
+        args = self.parse_input(line)
+        print(len([obj for obj in models.storage.all().values()
+                     if obj.__class__.__name__ == args[0]]))
+        
+
+
     def do_create(self, line):
         """Usage: create <class name>"""
         if line is None:
@@ -81,7 +115,7 @@ class HBNBCommand(cmd.Cmd):
             print (objs["{}.{}".format(args[0], id_no)])
         else:
             print("** no instance id found **")
-        
+
     def do_destroy(self, arg):
         """Usage: destroy <class name> <object id>"""
         if len(arg) == 0:
@@ -101,7 +135,7 @@ class HBNBCommand(cmd.Cmd):
             models.storage.save()
         else:
             print("** no instance id found **")
-        
+
     def do_all(self, arg):
         """Usage: all <class name> or all"""
         args = self.parse_input(arg)
@@ -110,12 +144,12 @@ class HBNBCommand(cmd.Cmd):
             return
         dict = models.storage.all().values()
         if args[0]:
-            print([str(obj) for obj in dict if 
+            print([str(obj) for obj in dict if
                   obj.__class__.__name__ == args[0]])
         else:
             print([str(obj) for obj in dict])
 
-    
+
     def do_update(self, arg):
         """Usage: update <class name> <id> <attribute name> '<attribute value>'"""
         args = self.parse_input(arg)
@@ -132,7 +166,7 @@ class HBNBCommand(cmd.Cmd):
         else:
             objs = models.storage.all()
             id_no = args[1]
-            if not any(obj.id == id_no for obj in objs.values() 
+            if not any(obj.id == id_no for obj in objs.values()
                        if obj.__class__.__name__ == args[0]):
                 print("** no instance id found **")
                 return;
@@ -149,9 +183,6 @@ class HBNBCommand(cmd.Cmd):
             args[3] = type(obj.__class__.__dict__[args[2]])(args[3])
             obj.__dict__[args[2]] = args[3]
         models.storage.save()
-
-    
-
 
     
 
