@@ -2,7 +2,7 @@
 #This module defines a base class for the airbnb project
 import uuid
 from datetime import datetime
-from models import storage
+import models
 
 
 class BaseModel:
@@ -19,7 +19,7 @@ class BaseModel:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-            storage.new(self)
+            models.storage.new(self)
     
     def __str__(self):
         #This defines the string attribute of the class
@@ -29,7 +29,7 @@ class BaseModel:
     def save(self):
         #This updates the public instance attribute updates_at
         self.updated_at = datetime.now()
-        storage.save()
+        models.storage.save()
     
     def to_dict(self):
         #This adds the class attributes to a dictionary

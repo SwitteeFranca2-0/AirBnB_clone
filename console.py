@@ -3,6 +3,9 @@
 
 import cmd
 from models.base_model import BaseModel
+import models
+import json
+import shlex
 
 class HBNBCommand(cmd.Cmd):
     """This class defines all functons of commands"""
@@ -11,6 +14,13 @@ class HBNBCommand(cmd.Cmd):
     ruler = "="
     doc_header = "Documented commands (type help <topic>)"
 
+    def parse_input(self, line: str):
+        """Overrides the parseline command"""
+        #if '""' in line:
+            #inp = shlex.split(line)
+            #return inp
+        inp = line.split(" ")
+        return inp
     def do_quit(self, line):
         """Quit command to exit the program\n"""
         exit();
@@ -24,7 +34,7 @@ class HBNBCommand(cmd.Cmd):
         pass;
     
     def do_create(self, line):
-        """This creates a new instance of BaseModel"""
+        """Usage: create <class name>"""
         if line is None:
             print("** class name missing **")
             return;
@@ -35,17 +45,84 @@ class HBNBCommand(cmd.Cmd):
         obj.save()
         print(obj.id)
 
-    def do_show(self, className=None, id=None):
-        """This displays information about a """
-        if className is None:
+    def do_show(self, arg):
+        """Usage: show <class name> <obj id> """
+        if len(arg) == 0:
             print("** class name missing **")
             return
-        if className != "BaseModel":
-            print("** class name doesn't exist ** ")
+        args = self.parse_input(arg)
+        if args[0] != "BaseModel":
+            print("** class doesn't exist ** ")
             return
-        if id is None:
+        if len(args) == 1:
             print("** instance id missing **")
-        ###not done
+            return;
+        id_no = args[1]
+        objs = models.storage.all()
+        if any(obj.id == id_no for obj in objs.values()):
+            print (objs["BaseModel.{}".format(id_no)])
+        else:
+            print("** no instance id found **")
+        
+    def do_destroy(self, arg):
+        """Usage: destroy <class name> <object id>"""
+        if len(arg) == 0:
+            print("** class name missing **")
+            return
+        args = self.parse_input(arg)
+        if args[0] != "BaseModel":
+            print("** class doesn't exist ** ")
+            return
+        if len(args) == 1:
+            print("** instance id missing **")
+            return;
+        id_no = args[1]
+        objs = models.storage.all()
+        if any(obj.id == id_no for obj in objs.values()):
+            del objs["BaseModel.{}".format(id_no)]
+            models.storage.save()
+        else:
+            print("** no instance id found **")
+        
+    def do_all(self, arg):
+        """Usage: all <class name> or all"""
+        args = self.parse_input(arg)
+        if args[0] and args[0] != "BaseModel":
+            print("** class doesn't exist ** ")
+            return
+        print([str(obj) for obj in models.storage.all().values()])
+    
+    def do_update(self, arg):
+        """Usage: update <class name> <id> <attribute name> '<attribute value>'"""
+        args = self.parse_input(arg)
+        if len(arg) == 0:
+            print("** class name missing **")
+            return
+        args = self.parse_input(arg)
+        if args[0] != "BaseModel":
+            print("** class doesn't exist ** ")
+            return
+        if len(args) == 1:
+            print("** instance id missing **")
+            return;
+        else:
+            objs = models.storage.all()
+            id_no = arg[1]
+            if any(obj.id == id_no for obj in objs.values()):
+                print("** no instance id found **")
+                return;
+        if len(args) == 2:
+            print("** attribute name missing **")
+            return
+        if len(args) == 3:
+            print("** value missing **")
+            return
+        obj = objs["BaseModel.{}".format(id_no)]
+        obj.arg[2] = arg[3]
+        models.storage.save()
+        
+        
+
     
 
 if __name__ == '__main__':
