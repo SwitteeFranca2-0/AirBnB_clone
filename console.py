@@ -110,7 +110,8 @@ class HBNBCommand(cmd.Cmd):
             return
         dict = models.storage.all().values()
         if args[0]:
-            print([str(obj) for obj in dict if obj.__class__.__name__ == args[0]])
+            print([str(obj) for obj in dict if 
+                  obj.__class__.__name__ == args[0]])
         else:
             print([str(obj) for obj in dict])
 
@@ -131,7 +132,8 @@ class HBNBCommand(cmd.Cmd):
         else:
             objs = models.storage.all()
             id_no = args[1]
-            if not any(obj.id == id_no for obj in objs.values() if obj.__class__.__name__ == args[0]):
+            if not any(obj.id == id_no for obj in objs.values() 
+                       if obj.__class__.__name__ == args[0]):
                 print("** no instance id found **")
                 return;
         if len(args) == 2:
@@ -141,9 +143,12 @@ class HBNBCommand(cmd.Cmd):
             print("** value missing **")
             return
         obj = objs["{}.{}".format(args[0], id_no)]
-        obj.__dict__[args[2]] = args[3]
+        if args[2] not in obj.__class__.__dict__.keys():
+            obj.__dict__[args[2]] = args[3]
+        else:
+            args[3] = type(obj.__class__.__dict__[args[2]])(args[3])
+            obj.__dict__[args[2]] = args[3]
         models.storage.save()
-        #To be contnued
 
     
 
