@@ -23,12 +23,12 @@ class HBNBCommand(cmd.Cmd):
         """This overides the emptyline command"""
         pass;
     
-    def do_create(self, obj=None):
+    def do_create(self, line):
         """This creates a new instance of BaseModel"""
-        if obj is None:
+        if line is None:
             print("** class name missing **")
             return;
-        if obj != "BaseModel":
+        if line != "BaseModel":
             print("** class name doesn't exist **")
             return
         obj = BaseModel()
