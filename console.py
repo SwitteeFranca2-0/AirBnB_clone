@@ -3,6 +3,12 @@
 
 import cmd
 from models.base_model import BaseModel
+from models.review import Review
+from models.user import User
+from models.place import Place
+from models.state import State
+from models.amenity import Amenity
+from models.city import City
 import models
 import json
 import shlex
@@ -13,14 +19,26 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
     ruler = "="
     doc_header = "Documented commands (type help <topic>)"
+    __classes = {
+        "BaseModel": BaseModel(),
+        "User": User(),
+        "Place": Place(),
+        "State": State(),
+        "City": City(),
+        "Amenity": Amenity(),
+        "Review": Review()
+    }
 
     def parse_input(self, line: str):
         """Overrides the parseline command"""
-        #if '""' in line:
-            #inp = shlex.split(line)
-            #return inp
+        if '""' in line:
+            inp = shlex.split(line)
+            print(inp)
+            return inp
         inp = line.split(" ")
+        inp = [o.strip('"') for o in inp]
         return inp
+    
     def do_quit(self, line):
         """Quit command to exit the program\n"""
         exit();
@@ -38,10 +56,10 @@ class HBNBCommand(cmd.Cmd):
         if line is None:
             print("** class name missing **")
             return;
-        if line != "BaseModel":
+        if line not in HBNBCommand.__classes.keys():
             print("** class name doesn't exist **")
             return
-        obj = BaseModel()
+        obj = HBNBCommand.__classes[line]
         obj.save()
         print(obj.id)
 
@@ -51,7 +69,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         args = self.parse_input(arg)
-        if args[0] != "BaseModel":
+        if args[0] not in HBNBCommand.__classes:
             print("** class doesn't exist ** ")
             return
         if len(args) == 1:
@@ -60,7 +78,7 @@ class HBNBCommand(cmd.Cmd):
         id_no = args[1]
         objs = models.storage.all()
         if any(obj.id == id_no for obj in objs.values()):
-            print (objs["BaseModel.{}".format(id_no)])
+            print (objs["{}.{}".format(args[0], id_no)])
         else:
             print("** no instance id found **")
         
@@ -70,7 +88,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         args = self.parse_input(arg)
-        if args[0] != "BaseModel":
+        if args[0] not in HBNBCommand.__classes:
             print("** class doesn't exist ** ")
             return
         if len(args) == 1:
@@ -79,7 +97,7 @@ class HBNBCommand(cmd.Cmd):
         id_no = args[1]
         objs = models.storage.all()
         if any(obj.id == id_no for obj in objs.values()):
-            del objs["BaseModel.{}".format(id_no)]
+            del objs["{}.{}".format(args[0], id_no)]
             models.storage.save()
         else:
             print("** no instance id found **")
@@ -87,19 +105,24 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, arg):
         """Usage: all <class name> or all"""
         args = self.parse_input(arg)
-        if args[0] and args[0] != "BaseModel":
+        if args[0] and args[0] not in HBNBCommand.__classes:
             print("** class doesn't exist ** ")
             return
-        print([str(obj) for obj in models.storage.all().values()])
+        dict = models.storage.all().values()
+        if args[0]:
+            print([str(obj) for obj in dict if obj.__class__.__name__ == args[0]])
+        else:
+            print([str(obj) for obj in dict])
+
     
     def do_update(self, arg):
         """Usage: update <class name> <id> <attribute name> '<attribute value>'"""
         args = self.parse_input(arg)
-        if len(arg) == 0:
+        if len(args) == 0:
             print("** class name missing **")
             return
         args = self.parse_input(arg)
-        if args[0] != "BaseModel":
+        if args[0] not in HBNBCommand.__classes:
             print("** class doesn't exist ** ")
             return
         if len(args) == 1:
@@ -107,8 +130,8 @@ class HBNBCommand(cmd.Cmd):
             return;
         else:
             objs = models.storage.all()
-            id_no = arg[1]
-            if any(obj.id == id_no for obj in objs.values()):
+            id_no = args[1]
+            if not any(obj.id == id_no for obj in objs.values() if obj.__class__.__name__ == args[0]):
                 print("** no instance id found **")
                 return;
         if len(args) == 2:
@@ -117,11 +140,13 @@ class HBNBCommand(cmd.Cmd):
         if len(args) == 3:
             print("** value missing **")
             return
-        obj = objs["BaseModel.{}".format(id_no)]
-        obj.arg[2] = arg[3]
+        obj = objs["{}.{}".format(args[0], id_no)]
+        obj.__dict__[args[2]] = args[3]
         models.storage.save()
-        
-        
+        #To be contnued
+
+    
+
 
     
 

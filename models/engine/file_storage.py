@@ -2,6 +2,12 @@
 #This is a module that holds the class file storage
 import json
 from  models.base_model import BaseModel
+from models.review import Review
+from models.user import User
+from models.place import Place
+from models.state import State
+from models.amenity import Amenity
+from models.city import City
 
 class FileStorage:
     """This class serializes instances to json strings"""

@@ -23,7 +23,7 @@ class BaseModel:
     
     def __str__(self):
         #This defines the string attribute of the class
-        obj = str(type(self)).split(".")[2].split("'>")[0]
+        obj = self.__class__.__name__
         return '[{}] ({}) {}'.format(obj, self.id, self.__dict__) 
     
     def save(self):
@@ -37,6 +37,6 @@ class BaseModel:
         o_dict.update(self.__dict__)
         o_dict["created_at"] = datetime.isoformat(self.__dict__["created_at"])
         o_dict["updated_at"] = datetime.isoformat(self.__dict__["updated_at"])    
-        o_dict["__class__"] = str(type(self)).split(".")[2].split("'>")[0]
+        o_dict["__class__"] = self.__class__.__name__
         return o_dict
 
