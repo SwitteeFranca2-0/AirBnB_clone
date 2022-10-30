@@ -10,7 +10,6 @@ from models.state import State
 from models.amenity import Amenity
 from models.city import City
 import models
-import json
 import shlex
 
 
@@ -31,7 +30,7 @@ class HBNBCommand(cmd.Cmd):
     }
 
     def parse_input(self, line: str):
-        """Paerses the command line arguments"""
+        """Parses the command line arguments"""
         if '"' in line:
             inp = shlex.split(line)
             inp = [o.strip('"') for o in inp]
@@ -82,9 +81,9 @@ class HBNBCommand(cmd.Cmd):
                     c2[cmd]('{} {} {} "{}" '.format(ar[0], id, atr, al))
                 else:
                     id = ar[1].split("(")[1].split("{")[0].strip(", ")
-                    at_d = ar[1].split("(")[1].split("{")[1].strip("}")
+                    at_d = '{' + ar[1].split("(")[1].split("{")[1].strip(")")
                     cmd = ar[1].split("(")[0]
-                    c2[cmd]('{} {} {{}}'.format(ar[0], id, at_d))
+                    c2[cmd]('{}.{} {}'.format(ar[0], id, at_d))
 
     def count(self, line):
         ar = self.parse_input(line)
@@ -158,16 +157,21 @@ class HBNBCommand(cmd.Cmd):
     def do_update(self, arg):
         """Usage: update <class name> <id> <attribute name>
             '<attribute value>'"""
-        if type(arg.split(" ")[2]) is dict:
-            id_no = arg.split(" ")[1]
-            dic_attr = arg.split(" ")[2]
+        if "{" in arg:
+            ar = arg.split(".")
+            cls = ar[0]
+            id_no = ar[1].split("{")[0].strip(" ")
+            at_d = ar[1].split("{")[-1].strip("}")
+            at_d = at_d.split(",")
+            b = {o.split(":")[0].strip(" '").strip(' "'):
+                 o.split(":")[1].strip(" '").strip(' "') for o in at_d}
             objs = models.storage.all()
             if not any(obj.id == id_no for obj in objs.values()
-                       if obj.__class__.__name__ == arg[0]):
+                       if obj.__class__.__name__ == cls):
                 print("** no instance found **")
             else:
-                [setattr(k, v) for k, v in dic_attr.items()
-                 for obj in objs if obj.id == id_no]
+                obj = objs["{}.{}".format(ar[0], id_no)]
+                [setattr(obj, k, v) for k, v in b.items()]
             models.storage.save()
             return
         ar = self.parse_input(arg)
