@@ -97,7 +97,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         if line not in HBNBCommand.__classes.keys():
-            print("** class name doesn't exist **")
+            print("** class doesn't exist **")
             return
         obj = HBNBCommand.__classes[line]
         obj.save()
@@ -120,7 +120,7 @@ class HBNBCommand(cmd.Cmd):
         if any(obj.id == id_no for obj in objs.values()):
             print(objs["{}.{}".format(ar[0], id_no)])
         else:
-            print("** no instance id found **")
+            print("** no instance found **")
 
     def do_destroy(self, arg):
         """Usage: destroy <class name> <object id>"""
@@ -140,7 +140,7 @@ class HBNBCommand(cmd.Cmd):
             del objs["{}.{}".format(ar[0], id_no)]
             models.storage.save()
         else:
-            print("** no instance id found **")
+            print("** no instance found **")
 
     def do_all(self, arg):
         """Usage: all <class name> or all"""
@@ -164,7 +164,7 @@ class HBNBCommand(cmd.Cmd):
             objs = models.storage.all()
             if not any(obj.id == id_no for obj in objs.values()
                        if obj.__class__.__name__ == arg[0]):
-                print("** no instance id found **")
+                print("** no instance found **")
             else:
                 [setattr(k, v) for k, v in dic_attr.items()
                  for obj in objs if obj.id == id_no]
@@ -186,7 +186,7 @@ class HBNBCommand(cmd.Cmd):
             id_no = ar[1]
             if not any(obj.id == id_no for obj in objs.values()
                        if obj.__class__.__name__ == ar[0]):
-                print("** no instance id found **")
+                print("** no instance found **")
                 return
         if len(ar) == 2:
             print("** attribute name missing **")
