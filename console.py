@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#This is the entry pont of the command
+# This is the entry pont of the command
 
 import cmd
 from models.base_model import BaseModel
@@ -12,6 +12,7 @@ from models.city import City
 import models
 import json
 import shlex
+
 
 class HBNBCommand(cmd.Cmd):
     """This class defines all functons of commands"""
@@ -30,66 +31,71 @@ class HBNBCommand(cmd.Cmd):
     }
 
     def parse_input(self, line: str):
-        """Overrides the parseline command"""
-        if '""' in line:
+        """Paerses the command line arguments"""
+        if '"' in line:
             inp = shlex.split(line)
-            print(inp)
+            inp = [o.strip('"') for o in inp]
             return inp
         inp = line.split(" ")
-        inp = [o.strip('"') for o in inp]
         return inp
 
     def do_quit(self, line):
         """Quit command to exit the program\n"""
-        exit();
+        exit()
 
     def do_EOF(self, line):
         """eof command to exit the program\n"""
-        exit();
+        exit()
 
     def emptyline(self):
         """This overides the emptyline command"""
-        pass;
-    
+        pass
+
     def default(self, line):
         """This overrides the default command"""
-        cmds = {"all()": self.do_all, 
+        cmds = {"all()": self.do_all,
                 "count()": self.count
-            }
-        cmds2 ={"show": self.do_show, 
-                "destroy": self.do_destroy,
-                "update": self.do_update
-            }
-        args = line.split(".")
+                }
+        c2 = {"show": self.do_show,
+              "destroy": self.do_destroy,
+              "update": self.do_update
+              }
+        ar = line.split(".")
         if "." not in line:
             print("** Unknown syntax: {} **".format(line))
             return
-        if args[1] not in cmds.keys() and args[1].split("(")[0] not in cmds2.keys():
+        if ar[1] not in cmds.keys() and ar[1].split("(")[0] not in c2.keys():
             print("** Unknown syntax: {} **".format(line))
             return
-        if args[1] in cmds:
-            cmds[args[1]]("{}".format(args[0]))
+        if ar[1] in cmds:
+            cmds[ar[1]]("{}".format(ar[0]))
         else:
-            if "update" not in args[1]:
-                id = args[1].split('("')[1].split('")')[0]
-                cmds2[args[1].split("(")[0]]("{} {}".format(args[0], id))
+            if "update" not in ar[1]:
+                id = ar[1].split('(')[1].split(')')[0]
+                c2[ar[1].split("(")[0]]("{} {}".format(ar[0], id))
             else:
-                pass
-                #To be continued
-
+                if "{" not in ar[1]:
+                    id = ar[1].split("(")[1].split(",")[0]
+                    atr = ar[1].split("(")[1].split(",")[1]
+                    al = ar[1].split("(")[1].split(",")[2].split(")")[0]
+                    cmd = ar[1].split("(")[0]
+                    c2[cmd]('{} {} {} "{}" '.format(ar[0], id, atr, al))
+                else:
+                    id = ar[1].split("(")[1].split("{")[0].strip(", ")
+                    at_d = ar[1].split("(")[1].split("{")[1].strip("}")
+                    cmd = ar[1].split("(")[0]
+                    c2[cmd]('{} {} {{}}'.format(ar[0], id, at_d))
 
     def count(self, line):
-        args = self.parse_input(line)
+        ar = self.parse_input(line)
         print(len([obj for obj in models.storage.all().values()
-                     if obj.__class__.__name__ == args[0]]))
-        
-
+              if obj.__class__.__name__ == ar[0]]))
 
     def do_create(self, line):
         """Usage: create <class name>"""
         if line is None:
             print("** class name missing **")
-            return;
+            return
         if line not in HBNBCommand.__classes.keys():
             print("** class name doesn't exist **")
             return
@@ -102,17 +108,17 @@ class HBNBCommand(cmd.Cmd):
         if len(arg) == 0:
             print("** class name missing **")
             return
-        args = self.parse_input(arg)
-        if args[0] not in HBNBCommand.__classes:
+        ar = self.parse_input(arg)
+        if ar[0] not in HBNBCommand.__classes:
             print("** class doesn't exist ** ")
             return
-        if len(args) == 1:
+        if len(ar) == 1:
             print("** instance id missing **")
-            return;
-        id_no = args[1]
+            return
+        id_no = ar[1]
         objs = models.storage.all()
         if any(obj.id == id_no for obj in objs.values()):
-            print (objs["{}.{}".format(args[0], id_no)])
+            print(objs["{}.{}".format(ar[0], id_no)])
         else:
             print("** no instance id found **")
 
@@ -121,70 +127,81 @@ class HBNBCommand(cmd.Cmd):
         if len(arg) == 0:
             print("** class name missing **")
             return
-        args = self.parse_input(arg)
-        if args[0] not in HBNBCommand.__classes:
+        ar = self.parse_input(arg)
+        if ar[0] not in HBNBCommand.__classes:
             print("** class doesn't exist ** ")
             return
-        if len(args) == 1:
+        if len(ar) == 1:
             print("** instance id missing **")
-            return;
-        id_no = args[1]
+            return
+        id_no = ar[1]
         objs = models.storage.all()
         if any(obj.id == id_no for obj in objs.values()):
-            del objs["{}.{}".format(args[0], id_no)]
+            del objs["{}.{}".format(ar[0], id_no)]
             models.storage.save()
         else:
             print("** no instance id found **")
 
     def do_all(self, arg):
         """Usage: all <class name> or all"""
-        args = self.parse_input(arg)
-        if args[0] and args[0] not in HBNBCommand.__classes:
+        ar = self.parse_input(arg)
+        if ar[0] and ar[0] not in HBNBCommand.__classes:
             print("** class doesn't exist ** ")
             return
         dict = models.storage.all().values()
-        if args[0]:
+        if ar[0]:
             print([str(obj) for obj in dict if
-                  obj.__class__.__name__ == args[0]])
+                  obj.__class__.__name__ == ar[0]])
         else:
             print([str(obj) for obj in dict])
 
-
     def do_update(self, arg):
-        """Usage: update <class name> <id> <attribute name> '<attribute value>'"""
-        args = self.parse_input(arg)
-        if len(args) == 0:
+        """Usage: update <class name> <id> <attribute name>
+            '<attribute value>'"""
+        if type(arg.split(" ")[2]) is dict:
+            id_no = arg.split(" ")[1]
+            dic_attr = arg.split(" ")[2]
+            objs = models.storage.all()
+            if not any(obj.id == id_no for obj in objs.values()
+                       if obj.__class__.__name__ == arg[0]):
+                print("** no instance id found **")
+            else:
+                [setattr(k, v) for k, v in dic_attr.items()
+                 for obj in objs if obj.id == id_no]
+            models.storage.save()
+            return
+        ar = self.parse_input(arg)
+        if len(ar) == 0:
             print("** class name missing **")
             return
-        args = self.parse_input(arg)
-        if args[0] not in HBNBCommand.__classes:
+        ar = self.parse_input(arg)
+        if ar[0] not in HBNBCommand.__classes:
             print("** class doesn't exist ** ")
             return
-        if len(args) == 1:
+        if len(ar) == 1:
             print("** instance id missing **")
-            return;
+            return
         else:
             objs = models.storage.all()
-            id_no = args[1]
+            id_no = ar[1]
             if not any(obj.id == id_no for obj in objs.values()
-                       if obj.__class__.__name__ == args[0]):
+                       if obj.__class__.__name__ == ar[0]):
                 print("** no instance id found **")
-                return;
-        if len(args) == 2:
+                return
+        if len(ar) == 2:
             print("** attribute name missing **")
             return
-        if len(args) == 3:
+        if len(ar) == 3:
             print("** value missing **")
             return
-        obj = objs["{}.{}".format(args[0], id_no)]
-        if args[2] not in obj.__class__.__dict__.keys():
-            obj.__dict__[args[2]] = args[3]
+        obj = objs["{}.{}".format(ar[0], id_no)]
+        if ar[2] not in obj.__class__.__dict__.keys():
+            obj.__dict__[ar[2]] = ar[3]
         else:
-            args[3] = type(obj.__class__.__dict__[args[2]])(args[3])
-            obj.__dict__[args[2]] = args[3]
+            ar[3] = type(obj.__class__.__dict__[ar[2]])(ar[3])
+            obj.__dict__[ar[2]] = ar[3]
         models.storage.save()
 
-    
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()

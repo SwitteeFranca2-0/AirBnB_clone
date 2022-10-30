@@ -1,14 +1,15 @@
 #!/usr/bin/python3
-#This module contains the palce class
+# This module contains the palce class
 
 from models.base_model import BaseModel
+
 
 class Place(BaseModel):
     """This defines place"""
     city_id = ""
     user_id = ""
     name = ""
-    description = "" 
+    description = ""
     number_rooms = 0
     number_bathrooms = 0
     max_guest = 0
