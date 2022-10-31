@@ -12,7 +12,8 @@ class BaseModel:
         """ This initialises vretaed class objects."""
         if kwargs:
             self.__dict__.update(kwargs)
-            del self.__dict__["__class__"]
+            if "__class__" in kwargs.keys():
+                del self.__dict__["__class__"]
             created = self.__dict__["created_at"]
             updated = self.__dict__["updated_at"]
             self.__dict__["created_at"] = datetime.fromisoformat(created)
