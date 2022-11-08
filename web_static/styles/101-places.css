@@ -2,6 +2,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-content: center;
 }
 
 .places h1 {
@@ -17,7 +18,9 @@
     border: 1px solid #FF5A5F;
     border-radius: 4px;
     text-align: center;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    
 
        
 }
@@ -47,7 +50,12 @@
     height: 80px;
     border-top: 1px solid #DDDDDD;
     border-bottom: 1px solid #DDDDDD;
-    position: relative;
+    margin-left: 30px;;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+
 }
 
 .places .user {
@@ -61,12 +69,14 @@
 }
 
 .places .amenities {
-    text-align: left;
+    display: flex;
+    flex-direction: column;
     width: 100%; 
     margin-top: 40px; 
 }
 
 .places .amenities h2 {
+    text-align: left;
     font-size: 16px;
     border-bottom: 1px solid #DDDDDD;
 }
@@ -79,9 +89,6 @@
 .places .amenities ul li {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
-    align-content: center;
-    align-items: end;
     margin-bottom: 10px;
 }
 
@@ -102,7 +109,6 @@
     background-size: cover;
     width: 20px;
     height: 20px;
-    display: inline-block;
 }
 .places .information .max_guest {
     width: 100px;
@@ -113,26 +119,17 @@
 .places .information .number_rooms {
     width: 100px;
     height: 75%;
-    display: inline-block;
-    position: absolute;
-    top: 0px;
-    left: 130px;
 }
 
 .places .information .number_bathrooms {
     width: 100px;
     height: 75%;
-    display: inline-block;
-    position: absolute;
-    top: 0px;
-    left: 260px;
 }
 
 
 .places .information .max_guest .icon {
     width: inherit;
     height: inherit;
-    margin-left: 30px;
     background-image: url("../images/icon_group.png");
     background-repeat: no-repeat;
 }
@@ -140,7 +137,6 @@
 .places .information .number_rooms .icon{
     width: inherit;
     height: inherit;
-    margin-left: 35px;
     background-image: url("../images/icon_bed.png");
     background-repeat: no-repeat
 }
@@ -148,16 +144,13 @@
 .places .information .number_bathrooms .icon{
     width: inherit;
     height: inherit;
-    margin-left: 30px;
     background-image: url("../images/icon_bath.png");
     background-repeat: no-repeat
 }
 .places .information .max_guest span, .number_rooms span, .number_bathrooms span {
-    position: absolute;
     font-size: 15px;
     width: inherit;
-    top: 55px;
-    left: 5px;
+    display: flex;
 }
 
 .places .reviews {
